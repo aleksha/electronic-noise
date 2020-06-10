@@ -25,4 +25,4 @@ For the deatils see **_doc/MC4NOISE.docx_**.
  1. Ask Alexey Dzyuba or Alexander Inglessi for the root-file with data
  2. Use **_dump/no_gui.C_** script to process it.
 
-
+Scripts has been tested with CERN ROOT v3.36.
