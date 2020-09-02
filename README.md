@@ -29,3 +29,23 @@ For the deatils see **_doc/MC4NOISE.docx_**.
  2. Use **_dump/no_gui.C_** script to process it.
 
 Scripts has been tested with CERN ROOT v5.36.
+
+## Resolution
+
+First one have to convert CSV file to the one with space-separator.
+After one can use ROOT script `resolution.C`.
+
+```bash
+cp dump.txt Dump.txt
+sed -i 's/,/ /g' Dump.txt
+root -b -q resolution.C
+```
+
+1 channel = 27.5 eV (if one use 5.5 MeV alpha calibration => 200000 ch.)
+
+Results are:
+ * Nev  = 1000 events
+ * GATE = 6 us
+ * MEAN = 1.22889e+06 a.u.
+ * SDV. = 762.773 a.u.
+ * RESO = 20.9763 keV
