@@ -50,9 +50,9 @@ For the real data results are:
  * SDV. = 762.773 a.u.
  * RESO = 20.9763 keV
 
-For the simulated noise:
- MEAN = 1.22845e+06 a.u.
- SDV. = 776.29 a.u.
- RESO = 21.348 keV
+For the simulated noise with same gate / number of events condition:
+ * MEAN = 1.22845e+06 a.u.
+ * SDV. = 776.29 a.u.
+ * RESO = 21.348 keV
 
 They are in reasonable agreement.
