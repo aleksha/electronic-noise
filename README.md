@@ -43,9 +43,16 @@ root -b -q resolution.C
 
 1 channel = 27.5 eV (if one use 5.5 MeV alpha calibration => 200000 ch.)
 
-Results are:
+For the real data results are:
  * Nev  = 1000 events
  * GATE = 6 us
  * MEAN = 1.22889e+06 a.u.
  * SDV. = 762.773 a.u.
  * RESO = 20.9763 keV
+
+For the simulated noise:
+ MEAN = 1.22845e+06 a.u.
+ SDV. = 776.29 a.u.
+ RESO = 21.348 keV
+
+They are in reasonable agreement.

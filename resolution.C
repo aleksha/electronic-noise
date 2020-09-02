@@ -30,6 +30,7 @@ void resolution(int gate=150 , int Nev=1000){
   //h_reso = new TH1F("h_reso","");
 
   std::ifstream fDATA("./Dump.txt" , std::ios::in);
+//  std::ifstream fDATA("/home/geant4/Data/Noise/MERGED/noise.data", std::ios::in);
   for(int ev=0;ev<Nev;ev++){
     clear_fadc();
 
