@@ -40,7 +40,6 @@ class anode_noise:
         self.dataset = []
 
         self.model = []
-        self.is_model = False
 
         max_diff  = []
         down_diff = []
@@ -257,9 +256,8 @@ class anode_noise:
 
             self.model.append( (mu1, si1, mu2, si2) )
 
-        self.is_model = True
 
-    def generate_event( self , fig_name = "GEN_EVENT.png"):
+    def generate_event( self , fig_name = "GEN_EVENT.png", n_events=1):
         """Return random event"""
         if not self.model:
             self.create_model()
@@ -275,27 +273,32 @@ class anode_noise:
             mu2 = self.model[chan][2]
             si2 = self.model[chan][3]
 
-            rep = norm(mu1,si1).rvs()
+            rep = np.random.normal(mu1, si1, n_events)
+
+
+
             if mu2==0 and si2==0:
-                imp = 0.0
-            else :
-                imp = norm(mu2,si2).rvs()
-            evt_newl_part1.append(    rep + 1j*imp )
+                imp = np.zeros(n_events)
+            else:
+                imp = np.random.normal(mu2, si2, n_events)
+
+            evt_newl_part1.append( rep + 1j*imp )
+
             if chan!=0:
                 evt_newl_part2.insert( 0, rep - 1j*imp )
 
         evt_newl = evt_newl_part1 + evt_newl_part2
-        evt_new = np.array(evt_newl) * self.channels
-        gen_event  = ifft( evt_new )
-
-#        plt.plot( gen_event, "black" )
-#        plt.grid( True )
-#        plt.xlabel("time, ch.")
-#        plt.ylabel("val, a.u.")
-#        plt.title("Generated EVENT")
-#        plt.savefig( fig_name )
-#        print("Time spectrum for generated event stored into " + fig_name )
-#        plt.clf()
+        evt_new = np.asarray(evt_newl) * self.channels
+        gen_event  = ifft( evt_new, axis=0 )
+        # plt.plot( gen_event, "black" )
+        # plt.grid( True )
+        # plt.xlabel("time, ch.")
+        # plt.ylabel("val, a.u.")
+        # plt.title("Generated EVENT")
+        # plt.savefig( fig_name )
+        # print("Time spectrum for generated event stored into " + fig_name )
+        # plt.clf()
+        
         return gen_event
 
     def create_model_chan(self, chan, fig_name = "CHANNEL.png", save_fig = True, test_it = False):
@@ -574,7 +577,7 @@ class anode_noise:
 
 #===============================================================================
 anode = anode_noise(dump_file_path)
-
+'''
 evt = anode.draw_event(1024)
 sig = anode.filter_average( ev_min =    0, ev_max = 4850, flt="none" ,fmax = 200)
 
@@ -587,7 +590,7 @@ plt.ylabel("val, a.u.")
 plt.title( "Signal for one event and averaged one")
 plt.savefig( "EV_EV-AVE.png" )
 plt.clf()
-
+'''
 #anode.filter_average( ev_min = 2000, ev_max = 4000, flt="none" )
 #anode.filter_average( flt="none" , xmin =0, xmax = 300 )
 #anode.filter_event(1024,flt="cut 28 30",xmin =0, xmax = 1000)
@@ -618,7 +621,7 @@ plt.clf()
 #    anode.hist_arg(idx,fig_name = "ARG_" + sname + ".png")
 
 #anode.create_model_chan( 110 , test_it = True)
-
+'''
 out_file = open("noise_events.data","w")
 for gev in range(N_EVENTS):
     real_arr = np.real ( anode.generate_event() )
@@ -630,4 +633,14 @@ for gev in range(N_EVENTS):
     ss += "\n"
     out_file.write(ss)
 out_file.close()
+'''
 
+anode.generate_event()
+from time import time
+n_batches = 20
+n_events = 5000
+
+start_time = time()
+for i in range(n_batches):
+    anode.generate_event(n_events=n_events)
+print('events per second:', n_events*n_batches/(time()-start_time))
