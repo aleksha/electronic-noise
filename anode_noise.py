@@ -27,10 +27,11 @@ def Arg( x, y ):
     if x == 0 and y > 0  : return 0.5*pi
     if x == 0 and y == 0 : return 0            # not defined actually
 #===============================================================================
+
 class anode_noise:
     """Class, which containg info about noise using calibration sample
        obtained with pulse generator"""
-
+    
     def __init__(self, dump_path):
         """Load csv dump, make fft"""
         self.channels = N_CHANNELS
@@ -38,57 +39,46 @@ class anode_noise:
         print("Loading anode dump file")
         self.path = dump_path
         self.dataset = []
-
         self.model = []
-
-        max_diff  = []
-        down_diff = []
-        ban_list  = []
-        ev_num    = 0
+        max_diff_list  = []
+        down_diff_list = []
+        # ban_list = []
         dumpfile = open(self.path,"r")
-        for line in dumpfile:
-            value_str_list = (line[:-1]).split(",")
-            value_list = []
-            for idx in range(self.channels):
-                value_list.append( float( value_str_list[idx] ) )
-            max_level = max( sum(value_list)/len(value_list) - min(value_list) ,
-                             max(value_list) - sum(value_list)/len(value_list) )
-            max_diff .append ( max_level )
-            if  sum(value_list)/len(value_list) - min(value_list) > max(value_list) - sum(value_list)/len(value_list)   :
-                down_diff.append ( sum(value_list)/len(value_list) - min(value_list)  )
-            if max_level > BAN_LEVEL:
-                ban_list.append( ev_num )
-            ev_num = ev_num + 1
-        dumpfile.close()
-        n, bins, patches = plt.hist( np.array(max_diff) , 100 , facecolor='green', alpha = 0.5)
-        m, bbbb, patche2 = plt.hist( np.array(down_diff), bins = bins, facecolor='yellow', alpha = 0.5)
+        with open(self.path, "r") as dumpfile:
+            for ev_num, line in enumerate(dumpfile):
+                value_str_list = (line[:-1]).split(",")
+                value_list = [float(value_str_list[i]) for i in range(self.channels)] # [float(i) for i in value_str_list]
+
+                mean_lvl = sum(value_list)/len(value_list)
+                max_lvl = max(value_list)
+                min_lvl = min(value_list)
+
+                max_diff = max(mean_lvl - min_lvl, max_lvl - mean_lvl)
+                max_diff_list.append(max_diff)
+
+                if mean_lvl - min_lvl > max_lvl - mean_lvl:
+                    down_diff_list.append(mean_lvl - min_lvl)
+                if max_diff < BAN_LEVEL:
+                    self.dataset.append(value_list)
+                    self.events += 1
+                # else:
+                #     ban_list.append(ev_num)
+
+        '''
+        n, bins, patches = plt.hist( np.array(max_diff_list) , 100 , facecolor='green', alpha = 0.5)
+        m, bbbb, patche2 = plt.hist( np.array(down_diff_list), bins = bins, facecolor='yellow', alpha = 0.5)
         plt.grid( True )
         plt.xlabel("maximal difference from event base line")
         plt.ylabel("events")
         plt.savefig( "MAX_DIFF.png" )
         plt.clf()
+        '''
 
-        dumpfile = open(self.path,"r")
-        ev_num = 0
-        for line in dumpfile:
-            if ev_num not in ban_list :
-                value_str_list = (line[:-1]).split(",")
-                value_list = []
-                for idx in range(self.channels):
-                    value_list.append( float( value_str_list[idx] ) )
-                self.dataset .append( np.array( value_list ) )
-                self.events   = self.events + 1
-            ev_num = ev_num + 1
-        dumpfile.close()
-
-        print("CHANNELS : " + str( self.channels ) )
-        print("EVENTS   : " + str( self.events   ) )
-        fft_list  = []
-        fft_list2 = []
+        print("CHANNELS : " + str(self.channels))
+        print("EVENTS   : " + str(self.events))
+        self.dataset = np.asarray(self.dataset)
         print("Performing fast Fourier transformation")
-        for event in self.dataset:
-            fft_list .append(  fft( event ) )
-        self.fftset  = fft_list
+        self.fftset = fft(self.dataset, axis=1)
 
     def draw_event(self, num, fig_name = "EVENT.png"):
         """Draw event number num into figure fig_name"""
