@@ -19,6 +19,8 @@ python3 anode_noise.py
 Generated events will be stored into **_noise_events.data_** file.
 Each line will contain a ADC value separated by space-character.
 
+A bit newer generator in in file `anode_noise_gen.py`
+
 ## Documentation
 
 For the deatils see **_doc/MC4NOISE.docx_**.
